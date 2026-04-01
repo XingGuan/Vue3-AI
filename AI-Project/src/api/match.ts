@@ -30,7 +30,8 @@ export interface RawMatch {
   hhomeWin: string | null
   goalLine: string | null
   isSingleMatch:boolean | false
-
+  homeTeamRank: number
+  awayTeamRank: number
 }
 
 // 前端使用的比赛数据结构
@@ -39,6 +40,8 @@ export interface Match {
   league: string
   homeTeam: string
   awayTeam: string
+  homeTeamRank?: number
+  awayTeamRank?: number
   odds: {
     home: number | null
     draw: number | null
@@ -117,12 +120,18 @@ const transformMatch = (raw: RawMatch): Match => {
     awayTeamId: raw.awayTeamId,
     leagueId: raw.leagueId,
     backColor: raw.backColor,
-    isSingleMatch: raw.isSingleMatch
+    isSingleMatch: raw.isSingleMatch,
+    homeTeamRank: raw.homeTeamRank,
+   awayTeamRank: raw.awayTeamRank
   }
 }
 
 // 转换比赛数组
-const transformMatches = (rawMatches: RawMatch[]): Match[] => {
+const transformMatches = (rawMatches: RawMatch[] | undefined): Match[] => {
+  if (!rawMatches || !Array.isArray(rawMatches)) {
+    console.warn('transformMatches received invalid data:', rawMatches)
+    return []
+  }
   return rawMatches.map(transformMatch)
 }
 
@@ -132,9 +141,9 @@ export const matchApi = {
     return apiClient.get<RawMatch[]>('/api/match/list', {
       params,
       ...config,
-    }).then((rawMatches: RawMatch[]) => {
-      // 转换数据格式
-      return transformMatches(rawMatches)
+    }).then((data) => {
+      // 响应拦截器已经返回了 data，不需要 .data
+      return transformMatches(data as any)
     })
   },
   
@@ -153,9 +162,9 @@ export const matchApi = {
   
   // 获取比赛详情
   getMatchDetail(matchId: number, config?: CustomRequestConfig) {
-    return apiClient.get<RawMatch>(`/api/match/${matchId}`, config).then((rawMatch: RawMatch) => {
-      // 转换数据格式
-      return transformMatch(rawMatch)
+    return apiClient.get<RawMatch>(`/api/match/${matchId}`, config).then((data) => {
+      // 转换数据格式（单个比赛需要包装成数组）
+      return transformMatches([data as any])[0]
     })
   },
   
@@ -176,29 +185,29 @@ export const matchApi = {
     return apiClient.get<RawMatch[]>('/match/list', {
       params: { status },
       ...config,
-    }).then((rawMatches: RawMatch[]) => {
-      return transformMatches(rawMatches)
+    }).then((data) => {
+      return transformMatches(data as any)
     })
   },
-  
+
   // 按联赛获取比赛列表
   getMatchesByLeague(leagueId: string, config?: CustomRequestConfig) {
     return apiClient.get<RawMatch[]>('/match/list', {
       params: { leagueId },
       ...config,
-    }).then((rawMatches: RawMatch[]) => {
-      return transformMatches(rawMatches)
+    }).then((data) => {
+      return transformMatches(data as any)
     })
   },
-  
+
   // 获取今天的比赛
   getTodayMatches(config?: CustomRequestConfig) {
     const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD
     return apiClient.get<RawMatch[]>('/match/list', {
       params: { date: today },
       ...config,
-    }).then((rawMatches: RawMatch[]) => {
-      return transformMatches(rawMatches)
+    }).then((data) => {
+      return transformMatches(data as any)
     })
   },
 }

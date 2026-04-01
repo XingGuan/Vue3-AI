@@ -26,7 +26,7 @@ export interface RawMatch {
   hdraw: string | null
   hhomeWin: string | null
   goalLine: string | null
-  isSigleMatch: boolean | false
+  isSingleMatch: boolean | false
 }
 
 // 前端使用的比赛数据类型
@@ -35,6 +35,8 @@ export interface Match {
   league: string
   homeTeam: string
   awayTeam: string
+  homeTeamRank?: number
+  awayTeamRank?: number
   odds: Odds
   matchTime: string
   fullMatchTime: string
@@ -46,7 +48,7 @@ export interface Match {
   awayTeamId: string
   leagueId: string
   backColor: string
-  isSigleMatch: boolean
+  isSingleMatch: boolean
 }
 
 export interface Odds {

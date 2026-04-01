@@ -72,9 +72,10 @@ const fetchAnalysis = async () => {
   error.value = ''
   
   try {
-    const response = await matchApi.getMatchAnalysis(props.match.id)
+    const response = await matchApi.getMatchAnalysis(props.match.id) as any
     console.log(response)
-     analysisData.value = response.aiAnalysis
+
+     analysisData.value =  response.aiAnalysis
      analysisTimestamp.value = response.timestamp
   } catch (err) {
     error.value = err instanceof Error ? err.message : '分析失败'
@@ -91,7 +92,8 @@ const parsedAnalysis = computed(() => {
 
 const formatTime = (fullTime: string) => {
   if (!fullTime) return ''
-  return formatMatchTime(fullTime.split(' ')[0], fullTime.split(' ')[1] || '')
+  const parts = fullTime.split(' ')
+  return formatMatchTime(parts[0] || '', parts[1] || '')
 }
 
 const formatTimestamp = (timestamp: number) => {

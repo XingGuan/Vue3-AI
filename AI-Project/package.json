@@ -18,8 +18,11 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "@types/highlight.js": "^9.12.4",
     "axios": "^1.6.0",
     "dayjs": "^1.11.10",
+    "element-plus": "^2.8.4",
+    "highlight.js": "^11.11.1",
     "lodash-es": "^4.17.21",
     "markdown-it": "^14.1.0",
     "pinia": "^3.0.4",

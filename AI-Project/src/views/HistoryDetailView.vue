@@ -65,9 +65,9 @@
             <span class="accuracy-label">AI预测:</span>
             <span class="accuracy-value">
               {{ getPredictionText(accuracyInfo.aiPrediction) || '未给出明确预测' }}
-              <span v-if="accuracyInfo.confidence > 0" class="confidence">
+              <!-- <span v-if="accuracyInfo.confidence > 0" class="confidence">
                 (置信度: {{ (accuracyInfo.confidence * 100).toFixed(1) }}%)
-              </span>
+              </span> -->
             </span>
           </div>
           <div class="accuracy-item">
@@ -134,9 +134,9 @@
         <button class="action-btn copy-btn" @click="copyDetail">
           复制内容
         </button>
-        <button class="action-btn delete-btn" @click="deleteRecord">
+        <!-- <button class="action-btn delete-btn" @click="deleteRecord">
           删除记录
-        </button>
+        </button> -->
       </div>
     </div>
 
@@ -202,16 +202,12 @@ const fetchDetail = async () => {
   error.value = ''
   
   try {
-    const response = await historyApi.getHistoryDetail(recordId.value)
+    const response = await historyApi.getHistoryDetail(recordId.value) as any
     console.log('API返回数据:', response)
-    
-    // 根据实际API响应结构调整
-    if (response && response.data) {
-      // 如果API返回 { code: 0, data: {...}, message: 'success' }
-      record.value = response.data
-    } else if (response && typeof response === 'object') {
-      // 如果直接返回记录对象
-      record.value = response as HistoryRecord
+
+     if (response && typeof response === 'object') {
+      // 响应拦截器已经返回了 data
+      record.value = response
     } else {
       console.error('API返回的数据结构不符合预期:', response)
       error.value = '数据格式错误'
@@ -306,11 +302,12 @@ ${record.value.afterMatchAnalysis}
 
 const deleteRecord = async () => {
   if (!record.value || !confirm('确定要删除这条记录吗？')) return
-  
+
   try {
-    await historyApi.deleteHistory(record.value.id)
-    alert('删除成功')
-    router.back()
+    // TODO: 后端需要实现删除接口
+    // await historyApi.deleteHistory(record.value.id)
+    alert('删除功能待后端实现')
+    // router.back()
   } catch (err) {
     console.error('删除记录失败:', err)
     alert('删除失败')

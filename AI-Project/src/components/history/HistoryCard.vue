@@ -46,14 +46,11 @@
     
     <div class="card-footer">
       <span class="create-time">记录时间: {{ formatCreateTime(record.createTime) }}</span>
-      <div class="actions">
+      <!-- <div class="actions">
         <button class="action-btn view-btn" @click="emit('view-detail', record.matchId)">
           查看
         </button>
-        <button class="action-btn delete-btn" @click="emit('delete', record.matchId)">
-          删除
-        </button>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -144,6 +141,14 @@ const formatCreateTime = (createTime: string | Date): string => {
 .history-card:hover {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
+}
+
+/* 移动端触摸反馈 */
+@media (hover: none) {
+  .history-card:active {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    transform: scale(0.98);
+  }
 }
 
 .history-card.accuracy-correct {
@@ -295,7 +300,7 @@ const formatCreateTime = (createTime: string | Date): string => {
 .view-detail-btn {
   position: absolute;
   right: 16px;
-  bottom: 16px;
+  bottom: 1px;
   background: none;
   border: none;
   color: #1890ff;
@@ -357,31 +362,164 @@ const formatCreateTime = (createTime: string | Date): string => {
 }
 
 @media (max-width: 768px) {
+  .history-card {
+    padding: 14px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+  }
+
   .card-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
   }
-  
+
+  .teams {
+    font-size: 16px;
+  }
+
+  .match-time {
+    font-size: 12px;
+  }
+
   .result-info {
     align-items: flex-start;
+    width: 100%;
+    gap: 4px;
   }
-  
+
+  .match-result {
+    font-size: 13px;
+    padding: 3px 10px;
+  }
+
+  .prediction-accuracy {
+    font-size: 11px;
+    padding: 2px 6px;
+  }
+
+  .card-content {
+    margin-bottom: 12px;
+  }
+
+  .odds-section {
+    padding: 10px;
+    margin-bottom: 12px;
+  }
+
   .odds-row {
     flex-wrap: wrap;
-    justify-content: flex-start;
-    gap: 12px;
+    justify-content: space-between;
+    gap: 8px;
   }
-  
+
+  .odds-label {
+    font-size: 12px;
+  }
+
+  .odds-value {
+    font-size: 15px;
+    min-width: 36px;
+  }
+
+  .analysis-section {
+    margin-top: 12px;
+  }
+
+  .analysis-preview {
+    padding: 12px;
+  }
+
+  .analysis-preview h4 {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  .markdown-preview {
+    font-size: 12px;
+    max-height: 50px;
+    line-height: 1.4;
+  }
+
+  .view-detail-btn {
+    font-size: 12px;
+    bottom: 8px;
+    right: 12px;
+  }
+
   .card-footer {
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     align-items: flex-start;
+    padding-top: 10px;
   }
-  
+
+  .create-time {
+    font-size: 11px;
+  }
+
   .actions {
     width: 100%;
     justify-content: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .history-card {
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+
+  .teams {
+    font-size: 15px;
+    line-height: 1.3;
+  }
+
+  .match-time {
+    font-size: 11px;
+  }
+
+  .match-result {
+    font-size: 12px;
+    padding: 2px 8px;
+  }
+
+  .odds-section {
+    padding: 8px;
+  }
+
+  .odds-row {
+    gap: 6px;
+  }
+
+  .odds-label {
+    font-size: 11px;
+  }
+
+  .odds-value {
+    font-size: 14px;
+    min-width: 32px;
+  }
+
+  .analysis-preview {
+    padding: 10px;
+  }
+
+  .analysis-preview h4 {
+    font-size: 13px;
+  }
+
+  .markdown-preview {
+    font-size: 11px;
+    max-height: 45px;
+  }
+
+  .view-detail-btn {
+    font-size: 11px;
+    bottom: 6px;
+    right: 10px;
   }
 }
 </style>

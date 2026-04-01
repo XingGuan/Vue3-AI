@@ -10,6 +10,8 @@ export interface HistoryRecord {
   awayWin: string | null
   aiAnalysis: string  // Markdown 格式
   matchResult: string // 例如 "2-1" 表示主队2:1客队
+  aiScore: string
+  aiResult: string
   afterMatchAnalysis: string  // Markdown 格式
   createTime: string | Date
 }
@@ -34,14 +36,10 @@ export interface HistoryListResponse {
 }
 
 // 历史记录详情响应
-export interface HistoryDetailResponse {
-  record: HistoryRecord
-  matchInfo?: {
-    league?: string
-    matchStatusName?: string
-    matchNumStr?: string
-  }
-}
+// export interface HistoryDetailResponse {
+//   record: HistoryRecord
+ 
+// }
 
 // 比赛结果统计
 export interface MatchResultStats {

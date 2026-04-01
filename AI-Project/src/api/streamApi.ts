@@ -9,11 +9,9 @@ export interface ChatMessage {
 
 export interface ChatRequest {
   messages: ChatMessage[]
-  stream?: boolean
   deepThinking?: boolean
-  temperature?: number
-  maxTokens?: number
 }
+
 
 // 打字机流式响应类型
 export interface StreamResponse {
@@ -81,7 +79,7 @@ export const streamChat = async (
           if (buffer.trim()) {
             const lines = buffer.split('\n')
             for (const line of lines) {
-              if (line.startsWith('data: ') && line.trim() !== 'data: ') {
+              if (line.startsWith('data:') && line.trim() !== 'data: ') {
                 const dataStr = line.slice(6).trim()
                 if (dataStr && dataStr !== '[DONE]') {
                   accumulatedText += dataStr
@@ -122,10 +120,7 @@ export const streamChat = async (
         // 继续读取下一个 chunk
         processChunk()
       } catch (error) {
-        if (error.name === 'AbortError') {
-          console.log('Stream aborted')
-          return
-        }
+    
         onError?.(error as Error)
       }
     }
@@ -258,9 +253,7 @@ export const streamChatSimple = async (
         }
       } catch (error) {
         console.error('Stream read error:', error)
-        if (error.name !== 'AbortError') {
-          onError?.(error as Error)
-        }
+      
       } finally {
         reader.releaseLock()
       }
@@ -336,8 +329,8 @@ export const streamChatSSE = async (
             if (buffer.trim()) {
               const lines = buffer.split('\n')
               for (const line of lines) {
-                if (line.startsWith('data: ')) {
-                  const text = line.slice(6).trim()
+                if (line.startsWith('data:')) {
+                  const text = line.slice(5).trim()
                   if (text && text !== '[DONE]') {
                     onData(text)
                   }
@@ -363,8 +356,8 @@ export const streamChatSSE = async (
           for (const line of lines) {
             if (line.trim() === '') continue
             
-            if (line.startsWith('data: ')) {
-              const text = line.slice(6).trim()
+            if (line.startsWith('data:')) {
+              const text = line.slice(5).trim()
               
               if (text === '[DONE]') {
                 onComplete?.()
@@ -379,10 +372,7 @@ export const streamChatSSE = async (
           }
         }
       } catch (error) {
-        if (error.name !== 'AbortError') {
-          console.error('SSE stream error:', error)
-          onError?.(error as Error)
-        }
+      
       } finally {
         reader.releaseLock()
       }
@@ -481,10 +471,7 @@ export const streamChatText = async (
           }
         }
       } catch (error) {
-        if (error.name !== 'AbortError') {
-          console.error('Text stream error:', error)
-          onError?.(error as Error)
-        }
+       
       } finally {
         reader.releaseLock()
       }

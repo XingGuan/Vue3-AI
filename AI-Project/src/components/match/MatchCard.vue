@@ -30,11 +30,17 @@
       <div class="odds-row" v-if="isSingleMatch && hasOdds">
         <div class="odds-label">
           <button 
-            class="analyze-btn" 
+            class="btn analyze-btn" 
             @click="onAnalyze" 
             :disabled="analyzing"
           >
-            {{ analyzing ? '分析中...' : '分析' }}
+            {{ analyzing ? 'ai解读中...' : 'ai解读' }}
+          </button>
+          <button 
+            class="btn analysis-btn" 
+            @click="onAnalysis"
+          >
+            分析
           </button>
         </div>
         <div class="odds-item">
@@ -55,11 +61,17 @@
       <div class="odds-row" v-if="!isSingleMatch && hasOdds">
         <div class="odds-label">
           <button 
-            class="analyze-btn" 
+            class="btn analyze-btn" 
             @click="onAnalyze" 
             :disabled="analyzing"
           >
-            {{ analyzing ? '分析中...' : '分析' }}
+            {{ analyzing ? 'ai解读中...' : 'ai解读' }}
+          </button>
+          <button 
+            class="btn analysis-btn" 
+            @click="onAnalysis"
+          >
+            分析
           </button>
         </div>
         <div class="odds-item">
@@ -119,16 +131,17 @@ import {
   formatOdds, 
   getOddsColor 
 } from '@/utils/matchUtils'
+import { useUserStore } from '@/stores/user'
+import { useRouter } from 'vue-router'
+
+const userStore = useUserStore()
+const router = useRouter()
 
 interface Props {
   match: Match
 }
 
 const props = defineProps<Props>()
-
-// const emit = defineEmits<{
-//   analyze: [matchId: number]
-// }>()
 
 const emit = defineEmits<{
   analyze: [match: Match]
@@ -138,8 +151,7 @@ const analyzing = ref(false)
 
 // 计算属性
 const hasOdds = computed(() => {
-  const odds = props.match.odds
-  return odds.home !== null && odds.draw !== null && odds.away !== null
+  return true
 })
 
 const hasHandicapOdds = computed(() => {
@@ -170,22 +182,48 @@ const getStatusText = (status: string) => {
 
 const formatMatchTime = (fullTime: string) => {
   const [dateString, timeString] = fullTime.split(' ')
-  return formatDisplayTime(dateString, timeString)
+  return formatDisplayTime(dateString || '', timeString || '')
 }
 
-const formatGoalLine = (goalLine: number | null): string => {
+const formatGoalLine = (goalLine: string | null): string => {
   if (goalLine === null) return ''
-  if (goalLine > 0) return `${goalLine}`
-  return goalLine.toString()
+  const num = parseFloat(goalLine)
+  if (isNaN(num)) return goalLine
+  if (num > 0) return `${num}`
+  return num.toString()
 }
 
 const onAnalyze = async () => {
+  if(!userStore.isLoggedIn) {
+    router.push('/login')
+    return
+  }
   analyzing.value = true
   try {
     emit('analyze', props.match)
   } finally {
     analyzing.value = false
   }
+}
+
+const onAnalysis = () => {
+  if(!userStore.isLoggedIn) {
+    router.push('/login')
+    return
+  }
+  
+  // 跳转到分析页面，传递matchId
+  router.push({
+    path: `/analysis/${props.match.id}`,
+    query: {
+      league: props.match.league,
+      homeTeam: props.match.homeTeam,
+      awayTeam: props.match.awayTeam,
+      homeTeamRank: props.match.homeTeamRank,
+      awayTeamRank: props.match.awayTeamRank,
+      matchTime: props.match.fullMatchTime
+    }
+  })
 }
 </script>
 
@@ -335,7 +373,7 @@ const onAnalyze = async () => {
 }
 
 .odds-label {
-  width: 48px;
+  width: 90px; /* 增加宽度以容纳两个按钮 */
   text-align: center;
   font-size: 12px;
   color: #666;
@@ -343,22 +381,28 @@ const onAnalyze = async () => {
   background: #f5f5f5;
   border-right: 1px solid #e8e8e8;
   display: flex;
+  flex-direction: column;
+  gap: 4px;
   justify-content: center;
-  align-items: center;
+  align-items: stretch;
 }
 
-/* 分析按钮样式 */
-.analyze-btn {
+/* 按钮基础样式 */
+.btn {
   width: 100%;
-  background: #1890ff;
-  color: white;
   border: none;
   border-radius: 3px;
-  padding: 4px 0;
+  padding: 6px 0;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  text-align: center;
+}
+
+.analyze-btn {
+  background: #1890ff;
+  color: white;
 }
 
 .analyze-btn:hover:not(:disabled) {
@@ -370,6 +414,16 @@ const onAnalyze = async () => {
   background: #8c8c8c;
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+.analysis-btn {
+  background: #52c41a;
+  color: white;
+}
+
+.analysis-btn:hover {
+  background: #73d13d;
+  transform: translateY(-1px);
 }
 
 .odds-item {
