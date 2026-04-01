@@ -10,9 +10,10 @@ export default defineConfig({
     }
   },
   server: {
+    host:"0.0.0.0",
     proxy: {
       '/foot': {
-        target: 'http://localhost:9000',
+        target: 'http://192.168.110.19:9000',
         changeOrigin: true,
         //rewrite: (path) => path.replace(/^\/foot/, '')
       }

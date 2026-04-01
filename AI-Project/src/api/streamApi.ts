@@ -28,7 +28,7 @@ export const streamChat = async (
   requestData: ChatRequest,
   onData: (content: string) => void,
   onError?: (error: Error) => void,
-  onComplete?: () => void
+  onComplete?: () => void,
 ): Promise<() => void> => {
   const controller = new AbortController()
   const signal = controller.signal
@@ -37,9 +37,9 @@ export const streamChat = async (
     const token = localStorage.getItem('token') || sessionStorage.getItem('token')
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      'Accept': 'text/event-stream',
+      Accept: 'text/event-stream',
     }
-    
+
     if (token) {
       headers['Authorization'] = `Bearer ${token}`
     }
@@ -75,7 +75,7 @@ export const streamChat = async (
     const processChunk = async () => {
       try {
         const { done, value } = await reader.read()
-        
+
         if (done) {
           // 确保所有缓冲数据都被处理
           if (buffer.trim()) {
@@ -90,7 +90,7 @@ export const streamChat = async (
               }
             }
           }
-          
+
           onComplete?.()
           return
         }
@@ -101,16 +101,16 @@ export const streamChat = async (
 
         for (const line of lines) {
           if (line.trim() === '') continue
-          
+
           if (line.startsWith('data: ')) {
             const dataStr = line.slice(6).trim()
-            
+
             // 检查是否结束
             if (dataStr === '[DONE]') {
               onComplete?.()
               return
             }
-            
+
             // 处理数据（假设后端返回的是纯文本内容）
             if (dataStr) {
               accumulatedText += dataStr
@@ -148,17 +148,17 @@ export const streamChatSimple = async (
   requestData: ChatRequest,
   onData: (text: string) => void,
   onError?: (error: Error) => void,
-  onComplete?: () => void
+  onComplete?: () => void,
 ): Promise<() => void> => {
   const controller = new AbortController()
-  
+
   try {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token')
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      'Accept': 'text/event-stream',
+      Accept: 'text/event-stream',
     }
-    
+
     if (token) {
       headers['Authorization'] = `Bearer ${token}`
     }
@@ -193,10 +193,10 @@ export const streamChatSimple = async (
       try {
         while (true) {
           const { done, value } = await reader.read()
-          
+
           if (done) {
             console.log('Stream finished, remaining buffer:', buffer)
-            
+
             // 处理剩余缓冲区
             if (buffer.trim()) {
               const lines = buffer.split('\n')
@@ -212,7 +212,7 @@ export const streamChatSimple = async (
                 }
               }
             }
-            
+
             // 处理不完整的行
             if (incompleteLine && incompleteLine.startsWith('data: ')) {
               const text = incompleteLine.slice(6).trim()
@@ -220,7 +220,7 @@ export const streamChatSimple = async (
                 onData(text)
               }
             }
-            
+
             onComplete?.()
             break
           }
@@ -228,29 +228,36 @@ export const streamChatSimple = async (
           // 解码数据，确保使用正确的编码
           const chunkText = decoder.decode(value, { stream: true })
           console.log('Received chunk:', chunkText, 'raw bytes:', value)
-          
+
           buffer += chunkText
-          
+
           // 按行分割，但要小心可能跨chunk的断行
           const lines = buffer.split('\n')
-          
+
           // 保留最后一行（可能不完整）
           buffer = lines.pop() || ''
-          
+
           // 处理完整的行
           for (const line of lines) {
             if (line.trim() === '') continue
-            
+
             if (line.startsWith('data: ')) {
               const text = line.slice(6).trim()
-              
+
               if (text === '[DONE]') {
                 onComplete?.()
                 return
               }
-              
+
               if (text) {
-                console.log('Processing text:', text, 'length:', text.length, 'char code:', text.charCodeAt(0))
+                console.log(
+                  'Processing text:',
+                  text,
+                  'length:',
+                  text.length,
+                  'char code:',
+                  text.charCodeAt(0),
+                )
                 onData(text)
               }
             }
@@ -282,23 +289,22 @@ export const streamChatSimple = async (
   }
 }
 
-
 // 在 streamApi.ts 中添加这个函数
 export const streamChatSSE = async (
   requestData: ChatRequest,
   onData: (text: string) => void,
   onError?: (error: Error) => void,
-  onComplete?: () => void
+  onComplete?: () => void,
 ): Promise<() => void> => {
   const controller = new AbortController()
-  
+
   try {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token')
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      'Accept': 'text/event-stream',
+      Accept: 'text/event-stream',
     }
-    
+
     if (token) {
       headers['Authorization'] = `Bearer ${token}`
     }
@@ -325,19 +331,19 @@ export const streamChatSSE = async (
     const reader = response.body.getReader()
     const decoder = new TextDecoder('utf-8')
     let buffer = ''
-    
+
     const readStream = async () => {
       try {
         while (true) {
           const { done, value } = await reader.read()
-          
+
           if (done) {
             // 处理剩余的缓冲数据
             if (buffer.trim()) {
               const lines = buffer.split('\n')
               for (const line of lines) {
-                if (line.startsWith('data: ')) {
-                  const text = line.slice(6).trim()
+                if (line.startsWith('data:')) {
+                  const text = line.slice(5).trim()
                   if (text && text !== '[DONE]') {
                     onData(text)
                   }
@@ -351,26 +357,25 @@ export const streamChatSSE = async (
           // 解码并处理数据
           const chunk = decoder.decode(value)
           console.log('Raw chunk received:', chunk)
-          
+
           buffer += chunk
-          
+
           // 按行处理完整的事件
           const lines = buffer.split('\n')
-          
+
           // 保持最后一行（可能不完整）在缓冲区中
           buffer = lines.pop() || ''
-          
+
           for (const line of lines) {
             if (line.trim() === '') continue
-            
-            if (line.startsWith('data: ')) {
-              const text = line.slice(6).trim()
-              
+            if (line.startsWith('data:')) {
+              const text = line.slice(5).trim()
+
               if (text === '[DONE]') {
                 onComplete?.()
                 return
               }
-              
+
               if (text) {
                 console.log('SSE event text:', text, 'length:', text.length)
                 onData(text)
@@ -408,16 +413,16 @@ export const streamChatText = async (
   requestData: ChatRequest,
   onData: (text: string) => void,
   onError?: (error: Error) => void,
-  onComplete?: () => void
+  onComplete?: () => void,
 ): Promise<() => void> => {
   const controller = new AbortController()
-  
+
   try {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token')
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     }
-    
+
     if (token) {
       headers['Authorization'] = `Bearer ${token}`
     }
@@ -450,7 +455,7 @@ export const streamChatText = async (
       try {
         while (true) {
           const { done, value } = await reader.read()
-          
+
           if (done) {
             if (accumulatedText) {
               onData(accumulatedText)
@@ -462,11 +467,11 @@ export const streamChatText = async (
           // 解码数据
           const chunk = decoder.decode(value, { stream: true })
           accumulatedText += chunk
-          
+
           // 尝试提取数据部分
           const lines = accumulatedText.split('\n')
           accumulatedText = lines.pop() || ''
-          
+
           for (const line of lines) {
             if (line.startsWith('data: ')) {
               const data = line.slice(6).trim()
@@ -503,13 +508,17 @@ export const streamChatText = async (
 
 // 非流式聊天 API（备用）
 export const chat = async (requestData: ChatRequest, config?: CustomRequestConfig) => {
-  return apiClient.post('/api/chat', {
-    ...requestData,
-    stream: false,
-  }, {
-    showLoading: true,
-    ...config,
-  })
+  return apiClient.post(
+    '/api/chat',
+    {
+      ...requestData,
+      stream: false,
+    },
+    {
+      showLoading: true,
+      ...config,
+    },
+  )
 }
 
 // 获取对话历史
@@ -520,9 +529,9 @@ export const getChatHistory = async (chatId?: string, config?: CustomRequestConf
 
 // 保存对话
 export const saveChat = async (
-  messages: ChatMessage[], 
-  title?: string, 
-  config?: CustomRequestConfig
+  messages: ChatMessage[],
+  title?: string,
+  config?: CustomRequestConfig,
 ) => {
   return apiClient.post('/api/chat/save', { messages, title }, config)
 }

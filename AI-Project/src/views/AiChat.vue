@@ -5,7 +5,7 @@
       <div class="model-info">
         <div class="logo">
           <svg viewBox="0 0 24 24" width="24" height="24">
-            <path fill="currentColor" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            <path fill="currentColor" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
           </svg>
         </div>
         <div class="model-details">
@@ -13,19 +13,15 @@
         </div>
       </div>
       <div class="header-actions">
-        <button 
-          @click="clearChat" 
-          class="action-btn secondary"
-          :disabled="isStreaming"
-        >
+        <button @click="clearChat" class="action-btn secondary" :disabled="isStreaming">
           <svg class="icon" viewBox="0 0 24 24">
-            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+            <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
           </svg>
           清空对话
         </button>
         <button @click="exportChat" class="action-btn secondary">
           <svg class="icon" viewBox="0 0 24 24">
-            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
           </svg>
           导出
         </button>
@@ -33,11 +29,7 @@
     </div>
 
     <!-- 聊天消息区域 -->
-    <div 
-      ref="messagesContainer" 
-      class="messages-container"
-      :class="{ 'has-messages': messages.length > 0 }"
-    >
+    <div ref="messagesContainer" class="messages-container" :class="{ 'has-messages': messages.length > 0 }">
       <!-- 初始欢迎状态 -->
       <div v-if="messages.length === 0" class="welcome-screen">
         <div class="quick-questions">
@@ -50,12 +42,8 @@
             </div>
           </div>
           <div v-else class="question-chips">
-            <button 
-              v-for="(question, index) in quickQuestions" 
-              :key="index"
-              @click="selectQuickQuestion(question)"
-              class="question-chip"
-            >
+            <button v-for="(question, index) in quickQuestions" :key="index" @click="selectQuickQuestion(question)"
+              class="question-chip">
               {{ question }}
             </button>
           </div>
@@ -65,21 +53,21 @@
       <!-- 消息列表 -->
       <div v-if="messages.length > 0" class="messages-list">
         <div v-for="(message, index) in messages" :key="index" class="message-wrapper">
-          <div 
-            :class="[
-              'message',
-              message.role === 'user' ? 'user-message' : 'assistant-message'
-            ]"
-          >
+          <div :class="[
+            'message',
+            message.role === 'user' ? 'user-message' : 'assistant-message'
+          ]">
             <div class="message-avatar">
               <div v-if="message.role === 'user'" class="avatar user-avatar">
                 <svg viewBox="0 0 24 24">
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                  <path
+                    d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                 </svg>
               </div>
               <div v-else class="avatar ai-avatar">
                 <svg viewBox="0 0 24 24">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  <path
+                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
                 </svg>
               </div>
             </div>
@@ -93,29 +81,32 @@
                 </span>
               </div>
               <div class="message-text" v-html="formatMessage(message.content)"></div>
-              
+
               <div v-if="message.role === 'assistant' && message.thinking" class="thinking-content">
                 <details>
                   <summary class="thinking-header">
                     <svg class="thinking-icon" viewBox="0 0 24 24">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                      <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
                     </svg>
                     <span>深度思考过程</span>
                   </summary>
                   <div class="thinking-text">{{ message.thinking }}</div>
                 </details>
               </div>
-              
+
               <div v-if="message.role === 'assistant'" class="message-actions">
                 <button @click="copyMessage(message.content)" class="action-btn small">
                   <svg class="icon small" viewBox="0 0 24 24">
-                    <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2z"/>
+                    <path
+                      d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2z" />
                   </svg>
                   复制
                 </button>
                 <button @click="regenerateResponse(index)" class="action-btn small" :disabled="isStreaming">
                   <svg class="icon small" viewBox="0 0 24 24">
-                    <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                    <path
+                      d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
                   </svg>
                   重新生成
                 </button>
@@ -131,7 +122,8 @@
           <div class="message-avatar">
             <div class="avatar ai-avatar">
               <svg viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
               </svg>
             </div>
           </div>
@@ -142,12 +134,12 @@
             </div>
             <div class="message-text">
               <!-- 使用span元素逐步显示字符，实现打字机效果 -->
-              <span 
-                v-for="(char, index) in currentResponse" 
+              <span
+                v-for="(char, index) in currentResponse"
                 :key="index"
                 class="typing-char"
-                :style="{ animationDelay: `${index * 30}ms` }"
-              >
+                >
+                <!-- :style="{ animationDelay: `${index * 30}ms` }" -->
                 {{ char }}
               </span>
               <span v-if="isStreaming" class="typing-cursor"></span>
@@ -158,56 +150,34 @@
     </div>
 
     <!-- 输入区域 -->
-    <div 
-      class="input-container" 
-      :class="{ 'centered': messages.length === 0, 'active': messages.length > 0 }"
-    >
+    <div class="input-container" :class="{ 'centered': messages.length === 0, 'active': messages.length > 0 }">
       <div class="input-wrapper">
         <div class="input-area">
           <div class="input-border">
-            <textarea
-              ref="inputArea"
-              v-model="userInput"
-              @keydown.enter.exact.prevent="handleSend"
-              @keydown.enter.shift.exact.prevent="userInput += '\n'"
-              placeholder="有什么问题想问我吗？"
-              :disabled="isStreaming"
-              rows="1"
-              class="message-input"
-              @input="autoResize"
-            ></textarea>
-            
+            <textarea ref="inputArea" v-model="userInput" @keydown.enter.exact.prevent="handleSend"
+              @keydown.enter.shift.exact.prevent="userInput += '\n'" placeholder="有什么问题想问我吗？" :disabled="isStreaming"
+              rows="1" class="message-input" @input="autoResize"></textarea>
+
             <div class="input-actions">
-              <button 
-                @click="stopStreaming" 
-                v-if="isStreaming" 
-                class="send-btn stop-btn"
-              >
+              <button @click="stopStreaming" v-if="isStreaming" class="send-btn stop-btn">
                 <svg class="icon" viewBox="0 0 24 24">
-                  <path d="M6 6h12v12H6z"/>
+                  <path d="M6 6h12v12H6z" />
                 </svg>
                 停止
               </button>
-              <button 
-                @click="handleSend" 
-                :disabled="!canSend" 
-                class="send-btn primary"
-              >
+              <button @click="handleSend" :disabled="!canSend" class="send-btn primary">
                 <svg class="icon" viewBox="0 0 24 24">
-                  <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                  <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
                 </svg>
                 <span class="btn-text">发送</span>
               </button>
             </div>
           </div>
-          
+
           <!-- 左下角选项 -->
           <div class="input-bottom-options">
-            <div 
-              class="deep-thinking-option"
-              :class="{ 'active': useDeepThinking }"
-              @click="useDeepThinking = !useDeepThinking"
-            >
+            <div class="deep-thinking-option" :class="{ 'active': useDeepThinking }"
+              @click="useDeepThinking = !useDeepThinking">
               <div class="thinking-toggle">
                 <div class="thinking-toggle-track">
                   <div class="thinking-toggle-thumb"></div>
@@ -271,7 +241,7 @@ const scrollToBottom = () => {
 
 const formatMessage = (content: string) => {
   if (!content) return ''
-  
+
   // 处理 Markdown 和格式化
   return content
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -298,10 +268,10 @@ const autoResize = () => {
 // 打字机效果显示
 const startTypingEffect = () => {
   stopTypingEffect()
-  
+
   currentPosition = 0
   currentResponse.value = ''
-  
+
   // 使用定时器模拟打字机效果
   typingInterval = window.setInterval(() => {
     if (currentPosition < fullResponse.length) {
@@ -343,11 +313,11 @@ const handleSend = async () => {
     timestamp: Date.now()
   }
   messages.value.push(userMsg)
-  
+
   // 清空输入框
   userInput.value = ''
   autoResize()
-  
+
   // 滚动到底部
   scrollToBottom()
 
@@ -418,12 +388,12 @@ const handleSend = async () => {
 
 const stopStreaming = () => {
   stopTypingEffect()
-  
+
   if (abortController) {
     abortController()
     abortController = null
   }
-  
+
   // 如果有部分响应，保存为消息
   if (fullResponse && fullResponse.length > 0) {
     messages.value.push({
@@ -438,7 +408,7 @@ const stopStreaming = () => {
       timestamp: Date.now()
     })
   }
-  
+
   isStreaming.value = false
   fullResponse = ''
   currentResponse.value = ''
@@ -449,7 +419,7 @@ const clearChat = () => {
     if (!confirm('正在生成内容，确定要清空吗？')) return
     stopStreaming()
   }
-  
+
   messages.value = []
   currentResponse.value = ''
   fullResponse = ''
@@ -489,7 +459,7 @@ const regenerateResponse = async (messageIndex: number) => {
 
   // 移除该助手消息
   messages.value.splice(messageIndex, 1)
-  
+
   // 重新发送对应的用户消息
   const userMessage = messages.value[userMessageIndex].content
   userInput.value = userMessage
@@ -502,7 +472,7 @@ const exportChat = () => {
     const role = msg.role === 'user' ? '用户' : 'AI助手'
     return `【${role}】${msg.timestamp ? ` (${formatTime(msg.timestamp)})` : ''}\n${msg.content}\n${msg.thinking ? `\n深度思考：\n${msg.thinking}\n` : ''}\n`
   }).join('\n---\n\n')
-  
+
   const blob = new Blob([chatText], { type: 'text/plain' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
@@ -731,10 +701,14 @@ onUnmounted(() => {
 }
 
 @keyframes loading {
-  0%, 60%, 100% {
+
+  0%,
+  60%,
+  100% {
     transform: translateY(0);
     opacity: 0.4;
   }
+
   30% {
     transform: translateY(-10px);
     opacity: 1;
@@ -783,6 +757,7 @@ onUnmounted(() => {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -898,6 +873,7 @@ onUnmounted(() => {
     opacity: 0;
     transform: translateY(2px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1022,8 +998,15 @@ onUnmounted(() => {
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
 }
 
 /* 输入区域样式 */
@@ -1253,54 +1236,54 @@ onUnmounted(() => {
   .chat-header {
     padding: 12px 16px;
   }
-  
+
   .messages-container {
     padding: 0;
   }
-  
+
   .messages-container.has-messages {
     padding: 16px;
   }
-  
+
   .welcome-screen {
     padding: 24px 16px;
   }
-  
+
   .question-chips {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .input-container {
     padding: 0 16px;
   }
-  
+
   .input-container.centered {
     left: 16px;
     right: 16px;
     bottom: 16px;
   }
-  
+
   .input-container.active {
     padding: 16px;
   }
-  
+
   .input-bottom-options {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
+
   .input-actions {
     position: static;
     margin-top: 12px;
     justify-content: flex-end;
   }
-  
+
   .message {
     gap: 12px;
   }
-  
+
   .message-content {
     max-width: calc(100% - 48px);
   }
